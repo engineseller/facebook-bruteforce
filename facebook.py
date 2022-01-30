@@ -42,7 +42,8 @@ def get_passwords():
     url = "https://raw.githubusercontent.com/danielmiessler/SecLists/master/Passwords/xato-net-10-million-passwords-100000.txt"
     try:
         r = requests.get(url, timeout=30)  # seconds
-        return r.text.split("\n")
+        data = str(r.text).replace('\r', '')
+        return data.split("\n")
     except Exception:
         return None
 
@@ -51,7 +52,8 @@ def get_proxies():
     url = "https://raw.githubusercontent.com/clarketm/proxy-list/master/proxy-list-raw.txt"
     try:
         r = requests.get(url, timeout=30)  # seconds
-        return r.text.split("\n")
+        data = str(r.text).replace('\r', '')
+        return data.split("\n")
     except Exception:
         return None
 
