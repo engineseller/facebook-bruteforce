@@ -1,4 +1,5 @@
-#!/bash/python3
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 import requests
 from bs4 import BeautifulSoup
@@ -44,17 +45,29 @@ def get_passwords():
         r = requests.get(url, timeout=30)  # seconds
         data = str(r.text).replace('\r', '')
         return data.split("\n")
-    except Exception:
+    except:
         return None
 
 
 def get_proxies():
-    url = "https://raw.githubusercontent.com/clarketm/proxy-list/master/proxy-list-raw.txt"
+    link_list = ['https://raw.githubusercontent.com/clarketm/proxy-list/master/proxy-list-raw.txt',
+                 'https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/http.txt',
+                 'https://raw.githubusercontent.com/ShiftyTR/Proxy-List/master/http.txt',
+                 'https://raw.githubusercontent.com/sunny9577/proxy-scraper/master/proxies.txt']
+
     try:
-        r = requests.get(url, timeout=30)  # seconds
-        data = str(r.text).replace('\r', '')
-        return data.split("\n")
-    except Exception:
+        proxies = []
+        for link in link_list:
+            response = requests.get(link, timeout=30)
+            output = response.content.decode()
+            proxy = output.split('\n')
+            proxies = proxies + proxy
+
+        proxies = list(filter(None, proxies))
+        random.shuffle(proxies)
+
+        return proxies
+    except:
         return None
 
 
@@ -62,18 +75,19 @@ def get_proxy(proxy):
     if proxy.count(".") != 3:
         return {}
 
-    proxies = {
-        'https': "https://" + proxy,
-        'http': "http://" + proxy,
+    proxy_type = 'http'
+    proxy_dict = {
+        "http": f"{proxy_type}://{proxy}",
+        "https": f"{proxy_type}://{proxy}",
     }
     proxy_ip = proxy.split(":")[0]
 
     try:
-        r = requests.get('https://www.wikipedia.org', proxies=proxies, timeout=5)
+        r = requests.get('https://www.wikipedia.org', proxies=proxy_dict, timeout=30)
         if proxy_ip == r.headers['X-Client-IP']:
-            return proxies
+            return proxy_dict
         return {}
-    except Exception:
+    except:
         return {}
 
 
